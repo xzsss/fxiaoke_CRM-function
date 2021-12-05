@@ -1,0 +1,60 @@
+
+//符合条件的数据id
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("PersonnelObj",ids)
+
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map.user_id as String
+  String id2 = map._id as String
+
+  //根据id找到销售订单----------------------------------------------------------------------------------
+  //客户名称，生命状态正常，当年销售订单，销售订单金额不为空
+    List searchCondition = [["owner":id],["life_status":"normal"]]
+    Fx.log.info("查询条件为 :" + searchCondition)
+    BigDecimal sum =  0//总金额
+    boolean hasData = true
+    Integer limit = 100
+    //循环聚合所有数据
+    Map updateData = [:]
+    Range range =  Ranges.of(0,200)
+    range.each { i -> 
+      if(hasData == false){
+        return
+      }
+      
+      Integer skip = i * limit
+      def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find("object_8apC6__c",searchCondition,limit,skip)
+      if(error){
+        hasData = false
+        Fx.log.info("查询失败" + "当前跳过的数量为 " + skip + "错误原因为" + errorMessage)
+        return
+      }
+      
+      //获取所有更新的数据,如果是预设对象，就在循环里面直接更新。
+      List dataList = result.dataList
+      if(dataList.size() < limit){
+        hasData = false
+      }
+      
+      //如果不需要合并数据，在这里就可以100条
+      dataList.each{ item_s->
+        Map objectData = item_s as Map
+        BigDecimal je1 = objectData.field_sWTwj__c as BigDecimal//价税合计
+
+        sum = sum + je1
+      }
+    }
+    String  sum2=sum as String
+    log.info("总金额为："+sum2)
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("PersonnelObj",id2,["field_5r0ox__c":sum2],false)
+  log.info(error2)
+  log.info(errorMessage2)
+//-----------------------------------------------------------------------------------------------------
+
+ // updateMap.put(id,["field_s5Su6__c":sum2])
+}
+log.info(updateMap)
+//def (Boolean error2,List data2,String errorMessage2) =  object.batchUpdate("AccountObj",updateMap)
+

@@ -1,0 +1,18 @@
+String  accountid = context.data['_id'];
+String account_no = context.data['account_no'];
+Map mapdate = [
+"field_bnoq1__c":account_no,
+"field_z6oa1__c":account_no,
+];
+ def rstUpdate = Fx.object.update("AccountObj",  accountid,  mapdate);
+ if( rstUpdate[0] ){
+  log.info("客户编号回填失败，原因："+rstUpdate[2]);
+}else{
+  log.info("客户编号回填成功：");
+}
+
+ 
+
+def(updateER,updateData,updateMsg) =  Fx.object.update( "AccountObj",  accountid,  ["field_a9Bwq__c":"是"])
+log.info(updateER)
+log.info(updateMsg)

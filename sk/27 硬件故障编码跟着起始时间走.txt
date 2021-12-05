@@ -1,0 +1,21 @@
+Date thisType = context.data.field_1WUBa__c as Date
+//String thisType2=thisType.substring(4,5)
+String year_str=thisType.year as String
+String month_str=thisType.month as String
+if(month_str.length()==1){
+  month_str="0"+month_str
+}
+String day_str=thisType.day as String
+if(day_str.length()==1){
+  day_str="0"+day_str
+}
+
+def returnByRule = IncrementNumber.buildRule
+ {
+      counter = thisType // 计数器的key,可以简单理解为一个标识,相同的标识的会递增
+      condition = "DAY"      // 按年、月、日重计 `YEAR`  `MONTH`  `DAY`  `NONE`
+      postfix = ""     //后缀
+      prefix = "RMASYS"+year_str+month_str+day_str+"-"       // 前缀
+      serialNumber = 3         // 编号位数
+ }
+return returnByRule

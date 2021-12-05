@@ -1,0 +1,24 @@
+//硬件故障明细
+List dl = context.details.object_4p71G__c as List 
+Map dl1 = dl[0] as Map
+Date ed = dl1['field_02JNN__c'] as Date
+Date rd = context.data.field_1WUBa__c as Date 
+
+log.info(rd)
+log.info(ed)
+UIEvent event = UIEvent.build(context) { 
+
+if( (rd!=null && rd!='') && (ed!=null && ed!=''  )){
+  if( rd>ed ){
+       editMaster("field_o28Wz__c": 'option2') 
+          remind Remind.Alert("已将质保情况调整为保外 ，请核对")
+  }else{
+     editMaster("field_o28Wz__c": 'option1') 
+        remind Remind.Alert("已将质保情况调整为保内 ，请核对")
+  }
+}else{
+
+remind Remind.Alert("未自动确定质保情况，请手动填写")
+}
+}
+return event

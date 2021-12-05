@@ -1,0 +1,15 @@
+String id = context.data['_id']
+List  created_by  = context.data['created_by'] as List;
+String created_byid = created_by.get(0)
+def(error,data,errorMessage) = Fx.org.findUserById(created_byid);
+//log.info(data)
+String name = data['name']
+String email =data['email']
+String emailname = email.substring( 0, email.length() -19);
+String updata = name+"/"+emailname
+def(error1,data1,errorMessage1) = Fx.object.update("object_xzW9R__c", id,  ["field_bxrO6__c":updata])
+ if( error1 ){
+   log.info("errorMessage1=="+errorMessage1)
+ }else{
+   log.info("填单人更新成功 =="+updata)
+ }

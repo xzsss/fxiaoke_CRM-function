@@ -1,0 +1,37 @@
+//新建UIEvent事件
+String need =""
+Map ids =  context.data as Map
+String id =ids["field_8mhm1__c"] as String
+List searchCondition = [["_id":id],["life_status":"normal"]]
+boolean hasData = true
+def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find("AccountObj",searchCondition,10,0)
+if(error){
+        hasData = false
+        Fx.log.info("查询失败错误原因为" + errorMessage)
+        return
+      }
+List dataList = result.dataList
+      if(dataList.size() < 1){
+        hasData = false
+      }
+      dataList.each{ item_s->
+        Map objectData = item_s as Map
+        BigDecimal je = objectData.field_yo7U2__c as BigDecimal
+if (je>=1){
+  need=je-1
+}else{
+  need=""
+}
+      }
+
+
+
+UIEvent event = UIEvent.build(context) { 
+   //主对象修改数据
+   
+   editMaster("field_c407H__c": need) 
+
+
+
+}
+return event

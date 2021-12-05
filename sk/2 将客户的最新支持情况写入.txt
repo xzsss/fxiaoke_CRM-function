@@ -1,0 +1,3 @@
+String newtype =  context.data.field_p7xK4__c as String 
+String kh =  context.data.field_dPWql__c as String 
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("AccountObj",kh,["field_4i36T__c":newtype],false)

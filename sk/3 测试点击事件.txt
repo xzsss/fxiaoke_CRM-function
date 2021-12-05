@@ -1,0 +1,25 @@
+String type = context.arg.form_field_tx3d2__c as String//
+// SDK/测试 0fp23PRGq
+//软件 X3OzDtgd0
+//spec TTmpnac26
+//硬件 2CW7Zf6iu
+//
+
+String sdktype = context.arg.form_field_12nGV__c as String
+String softwaretype = context.arg.form_field_h8co8__c as String
+String spectype = context.arg.form_field_E1i28__c as String
+String hwtype = context.arg.form_field_Qj06y__c as String
+
+if(type=='0fp23PRGq' && (sdktype==null ||sdktype=='')){
+  return [ "error":true, "errorMessage":"SDK/测试类型 必须填写", "block":true ]
+}
+
+if(type=='X3OzDtgd0' && (softwaretype==null||softwaretype=='')){
+  return [ "error":true, "errorMessage":"软件类型 必须填写", "block":true ]
+}
+if(type=='TTmpnac26' && (spectype==null||spectype=='')){
+  return [ "error":true, "errorMessage":"SPEC类型 必须填写", "block":true ]
+}
+if(type=='2CW7Zf6iu' && (hwtype==null||hwtype=='')){
+  return [ "error":true, "errorMessage":"硬件类型 必须填写", "block":true ]
+}

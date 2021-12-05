@@ -1,0 +1,64 @@
+
+//符合条件的数据id
+
+
+
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("ProductObj",ids)
+if(error1){
+       
+        Fx.log.info("查询失败" + "错误原因为" + errorMessage1)
+        return
+      }
+Map updateMap = [:] as Map
+String id = ""
+if(dataList1.size()==0 ){
+log.info("没有找到")
+log.info( context.data)
+  
+}
+dataList1.each{ item ->
+  Map map = item as Map
+  id = map._id as String
+  String code = map.name as String
+  String type = ""
+  //判断code 也就是物料编码
+  if(
+    code.startsWith("201.")
+  ||code.startsWith("102080207")
+  ||code.startsWith("102080208")
+  ||code.startsWith("102080402")
+  ){
+    //交换芯片
+    type="option1"
+    
+  }else if(
+    code.startsWith("503")
+  ||code.startsWith("40102")
+  ||code.startsWith("40106")
+  ||code==("606.10.021")
+  ||code==("606.10.022")
+    ){
+      //板卡
+       type="q2b5fQfuM"
+    
+  }else if(
+    code.startsWith("9")
+
+    ){
+      //交换机
+       type="n9Gd1wo8L"
+    
+  }
+  log.info(type)
+if(type!=""){
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("ProductObj",id,["field_b8x6a__c":type],false)
+  def (Boolean error3,Map data3,String errorMessage3) =  Fx.object.update("ProductObj",id,["field_aWzdv__c":"option1"],false)
+}
+//def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("object_B678w__c",id,["field_7jlLV__c":res1],false)
+
+  //def (Boolean error3,Map data3,String errorMessage3) =  Fx.object.update("object_B678w__c",id,["field_7A982__c":res2],false)
+
+  //updateMap.put(id,["field_eEPjE__c":sum])
+  //updateMap.put(id,["field_8rm36__c":(sum2/sum)])
+}

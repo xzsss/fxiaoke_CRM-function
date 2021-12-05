@@ -1,0 +1,70 @@
+
+Date dt_now = Date.now() as Date//当前时间
+log.info("当前时间"+dt_now)
+Date dt_now_first=dt_now.withMonth(1).withDay(1)
+log.info("//当年开始时间"+dt_now_first)
+log.info("//当年开始时间"+dt_now_first)
+Date dt_lastyear = dt_now_first-1.years
+log.info("去年开始时间"+dt_lastyear)
+Date dt_afteryear=dt_now_first+1.years
+log.info("下年开始时间"+dt_afteryear)
+
+//符合条件的数据id
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("AccountObj",ids)
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map._id as String
+  //根据id找到销售订单----------------------------------------------------------------------------------
+  //客户名称，生命状态正常，当年销售订单，销售订单金额不为空
+    List searchCondition = [["field_oDTog__c":id],["life_status":"normal"],["field_9jpY2__c":Operator.EXISTS(true)],["field_BJqut__c": Operator.GTE(dt_now_first)]]
+    Fx.log.info("查询条件为 :" + searchCondition)
+    BigDecimal sum =  0//总金额
+    BigDecimal sum2 =  0//总金额
+    boolean hasData = true
+    Integer limit = 100
+    //循环聚合所有数据
+    Map updateData = [:]
+    Range range =  Ranges.of(0,200)
+    range.each { i -> 
+      if(hasData == false){
+        return
+      }
+      
+      Integer skip = i * limit
+      def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find("object_1b4nH__c",searchCondition,limit,skip)
+      if(error){
+        hasData = false
+        Fx.log.info("查询失败" + "当前跳过的数量为 " + skip + "错误原因为" + errorMessage)
+        return
+      }
+      
+      //获取所有更新的数据,如果是预设对象，就在循环里面直接更新。
+      List dataList = result.dataList
+      if(dataList.size() < limit){
+        hasData = false
+      }
+      
+      //如果不需要合并数据，在这里就可以100条
+      dataList.each{ item_s->
+        Map objectData = item_s as Map
+        BigDecimal je = objectData.field_9jpY2__c as BigDecimal//销售订单的金额
+        BigDecimal je2 = objectData.field_dTsvp__c as BigDecimal
+        sum += je
+        sum2 += je2
+      }
+    }
+    log.info("总金额为："+sum)
+    String sums=sum as String
+    String sums2=sum2 as String
+//-----------------------------------------------------------------------------------------------------
+  //updateMap.put(id,["field_wl316__c":sums])
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("AccountObj",id,["field_9fuyU__c":sums],false)
+  def (Boolean error3,Map data3,String errorMessage3) =  Fx.object.update("AccountObj",id,["field_71u4j__c":sums2],false)
+  //log.info(error2)
+  //log.info(errorMessage2)
+}
+//log.info(updateMap)
+//def (Boolean error2,List data2,String errorMessage2) =  object.batchUpdate("AccountObj",updateMap)
+

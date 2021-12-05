@@ -1,0 +1,25 @@
+//create by zengyu.kou 2020.9.28
+//新建出库单明细自动关联订单产品
+String dataId = context.data["_id"] as String
+String code = context.data["field_1juF1__c"] as String //上游单据分录内码
+
+//根据 出库单"上游单据分录内码"查找订单"分录内码"
+List criteria = [
+  ["field_9dV13__c":code],
+  ["life_status":"normal"],
+]
+def(error,data,msg) = Fx.object.find("SalesOrderProductObj",  criteria,  1,  0)
+if( (data["size"] as int )>0){       //判断查询出来的结果有没有数据
+  List datalist = data["dataList"] as List
+  String detailId = datalist[0]["_id"] as String
+  
+  //更新出库单明细
+  Map updateMap = [
+    "field_XFJri__c":detailId
+  ]
+  (error,data,msg) = Fx.object.update("object_1nopg__c", dataId,  updateMap)
+  log.info("更新出库单明细"+error)
+  log.info("更新出库单明细"+msg)
+}else{
+  log.info("没有根据出库单明细中的上游分录内码，找到对应的订单产品的分录内码")
+}

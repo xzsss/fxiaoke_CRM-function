@@ -1,0 +1,20 @@
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("object_5ij1f__c",ids)
+
+dataList1.each{ item ->
+if(item["field_PtlVu__c"]==null){
+  String detailId = item["_id"] as String
+
+
+  Map updateMap = [
+          "field_PtlVu__c":'option1'
+        ]
+  def(errorU,dataU,msgU) = Fx.object.update("object_5ij1f__c",  detailId,  updateMap)
+  
+  log.info(errorU)
+  log.info(dataU)
+  log.info(msgU)
+}
+
+
+}

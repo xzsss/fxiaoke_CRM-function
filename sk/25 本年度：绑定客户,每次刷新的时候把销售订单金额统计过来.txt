@@ -1,0 +1,78 @@
+/*
+1.创建日期：2020-11-12
+2.创建人：陈晓峰
+3.代码功能：
+本年度合同额：下单日期为本年度的销售订单金额
+上一年度合同额：下单日期为上一年度销售订单金额
+4.触发机制：
+计划任务：绑定客户,每次刷新的时候把销售订单金额统计过来
+5.注意事项：
+本年度合同额要找到一月一号到下年一月一号，因为有的下单日期大于当前日期
+上一年度合同额不需要经常刷新
+需要考虑销售订单金额必须生命状态为正常，且金额不能为空的过滤
+计划任务每次分组传过来20条数据，不用单选findByids超过100条
+查找到的销售订单需要分页
+*/
+Date dt_now = Date.now() as Date//当前时间
+log.info("当前时间"+dt_now)
+Date dt_now_first=dt_now.withMonth(1).withDay(1)
+log.info("//当年开始时间"+dt_now_first)
+log.info("//当年开始时间"+dt_now_first)
+Date dt_lastyear = dt_now_first-1.years
+log.info("去年开始时间"+dt_lastyear)
+Date dt_afteryear=dt_now_first+1.years
+log.info("下年开始时间"+dt_afteryear)
+
+//符合条件的数据id
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("AccountObj",ids)
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map._id as String
+  //根据id找到销售订单----------------------------------------------------------------------------------
+  //客户名称，生命状态正常，当年销售订单，销售订单金额不为空
+    List searchCondition = [["account_id":id],["life_status":"normal"],["order_amount":Operator.EXISTS(true)],["order_time": Operator.GTE(dt_now_first)],["order_time": Operator.LT(dt_afteryear)]]
+    Fx.log.info("查询条件为 :" + searchCondition)
+    BigDecimal sum =  0//总金额
+    boolean hasData = true
+    Integer limit = 100
+    //循环聚合所有数据
+    Map updateData = [:]
+    Range range =  Ranges.of(0,200)
+    range.each { i -> 
+      if(hasData == false){
+        return
+      }
+      
+      Integer skip = i * limit
+      def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find("SalesOrderObj",searchCondition,limit,skip)
+      if(error){
+        hasData = false
+        Fx.log.info("查询失败" + "当前跳过的数量为 " + skip + "错误原因为" + errorMessage)
+        return
+      }
+      
+      //获取所有更新的数据,如果是预设对象，就在循环里面直接更新。
+      List dataList = result.dataList
+      if(dataList.size() < limit){
+        hasData = false
+      }
+      
+      //如果不需要合并数据，在这里就可以100条
+      dataList.each{ item_s->
+        Map objectData = item_s as Map
+        BigDecimal je = objectData.order_amount as BigDecimal//销售订单的金额
+        sum += je
+      }
+    }
+    log.info(map.name )
+    log.info("总金额为："+sum)
+    BigDecimal a= sum as BigDecimal
+//-----------------------------------------------------------------------------------------------------
+  //updateMap.put(id,["field_534FW__c":a])
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("AccountObj",id,["field_534FW__c":a])
+}
+//log.info(updateMap)
+
+

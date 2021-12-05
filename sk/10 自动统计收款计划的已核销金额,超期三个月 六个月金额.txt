@@ -1,0 +1,115 @@
+Date dt_now = Date.now() as Date//当前时间
+//符合条件的数据id
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("PersonnelObj",ids)
+
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map.user_id as String
+  String id2 = map._id as String
+
+  //根据id找到销售订单----------------------------------------------------------------------------------
+  //客户名称，生命状态正常，当年销售订单，销售订单金额不为空
+    List searchCondition = [["owner":id],["life_status":"normal"]]
+    Fx.log.info("查询条件为 :" + searchCondition)
+    BigDecimal sum1 =  0//总金额
+	BigDecimal sum2 =  0//总金额
+	BigDecimal sum3 =  0//总金额
+	BigDecimal sum4 =  0//总金额
+	BigDecimal sum5 =  0//总金额
+	BigDecimal sum6 =  0//总金额
+    boolean hasData = true
+    Integer limit = 100
+    //循环聚合所有数据
+    Map updateData = [:]
+    Range range =  Ranges.of(0,200)
+    range.each { i -> 
+      if(hasData == false){
+        return
+      }
+      
+      Integer skip = i * limit
+      def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find("object_8apC6__c",searchCondition,limit,skip)
+      if(error){
+        hasData = false
+        Fx.log.info("查询失败" + "当前跳过的数量为 " + skip + "错误原因为" + errorMessage)
+        return
+      }
+      
+      //获取所有更新的数据,如果是预设对象，就在循环里面直接更新。
+      List dataList = result.dataList
+      if(dataList.size() < limit){
+        hasData = false
+      }
+      
+      //如果不需要合并数据，在这里就可以100条
+      dataList.each{ item_s->
+        Map objectData = item_s as Map
+ 
+        BigDecimal je1 = objectData.field_zDaZo__c as BigDecimal//已核销金额本位币
+        
+		BigDecimal je2 = objectData.field_6vj2l__c as BigDecimal//超期三个月
+		BigDecimal je3 = objectData.field_kL59d__c as BigDecimal//超期六个月
+		BigDecimal je4 = objectData.field_sWTwj__c as BigDecimal//价税合计
+        sum1 = sum1 + je1
+		sum2 = sum2 + je2
+		sum3 = sum3 + je3
+		sum5 = sum5 + je4
+      }
+	  
+	  def(Boolean error7,QueryResult result7,String errorMessage7) = Fx.object.find("SalesOrderObj",searchCondition,limit,skip)
+
+	  if(error7){
+        hasData = false
+        Fx.log.info("查询失败" + "当前跳过的数量为 " + skip + "错误原因为" + errorMessage7)
+        return
+      }
+      List dataList2 = result7.dataList
+      if(dataList2.size() < limit){
+        hasData = false
+      }
+     
+      dataList2.each{ item_s->
+        Map objectData2 = item_s as Map
+ 
+        BigDecimal je5 = objectData2.field_00luA__c as BigDecimal
+ 
+		    BigDecimal je6 = objectData2.field_tO2zm__c as BigDecimal
+		    BigDecimal je7 = objectData2.field_1puKN__c as BigDecimal
+		    if(objectData2.field_1puKN__c==null){
+		      je7=1
+		    }
+		    if(objectData2.field_00luA__c ==null){
+		      je5=0
+		    }
+		    if(objectData2.field_tO2zm__c ==null){
+		      je6=0
+		    }
+BigDecimal temp = (je5.setScale(2,BigDecimal.ROUND_HALF_UP) - je6.setScale(2,BigDecimal.ROUND_HALF_UP)) as BigDecimal
+
+        sum6 = sum6 + (je5 - je6)*je7
+        sum6=sum6.setScale(2,BigDecimal.ROUND_HALF_UP)
+
+
+      }
+	  
+    }
+
+
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("PersonnelObj",id2,["field_Nsc9p__c":sum1],false)
+
+  def (Boolean error3,Map data3,String errorMessage3) =  Fx.object.update("PersonnelObj",id2,["field_E4299__c":sum2],false)
+
+  def (Boolean error4,Map data4,String errorMessage4) =  Fx.object.update("PersonnelObj",id2,["field_i1Gy9__c":sum3],false)
+  
+  def (Boolean error5,Map data5,String errorMessage5) =  Fx.object.update("PersonnelObj",id2,["field_wv3Aa__c":dt_now],false)
+  
+  def (Boolean error6,Map data6,String errorMessage6) =  Fx.object.update("PersonnelObj",id2,["field_78n6C__c":sum6],false)
+  
+  
+
+}
+
+
+

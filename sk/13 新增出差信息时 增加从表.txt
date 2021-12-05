@@ -1,0 +1,31 @@
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("object_B678w__c",ids)
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map._id as String
+  String apid1=map.field_aw2e0__c as String
+  String apid2=map.field_bDoA1__c as String
+  String apid3=map.field_167tb__c as String
+  String apid4=map.field_2pAPg__c as String
+  String apid5=map.field_Jh1s4__c as String
+  String apid6=map.field_15i4m__c as String
+  List searchCondition = [["field_KB4sr__c":id],["life_status":"normal"]]
+  def(Boolean error0,QueryResult result0,String errorMessage0) = Fx.object.find("object_89Lp4__c",searchCondition,10,0)
+  List dataList0 = result0.dataList
+  dataList0.each{ item_s->
+        Map objectData = item_s as Map
+        String  delid = objectData._id
+        def (Boolean error,Map data,String errorMessage) =  Fx.object.remove("object_89Lp4__c",delid)
+      }
+
+  List apids =[apid1,apid2,apid3,apid4,apid5,apid6]
+  apids.each { apid -> 
+  if(apid==null){
+    return
+  }
+  String needid = apid.substring(1,(apid.length()-1))
+def(Boolean error,Map data,String errorMessage) = Fx.object.create("object_89Lp4__c",["field_KB4sr__c":id,"field_Js42h__c":[needid]])
+  }
+}
+

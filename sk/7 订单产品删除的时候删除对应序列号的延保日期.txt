@@ -1,0 +1,41 @@
+List ids =  context.objectIds as List
+log.info( "ids")
+log.info( ids)
+String dataId = context.data["_id"] as String
+log.info( "dataId")
+log.info( dataId)
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("SalesOrderProductObj",ids)
+
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map.field_eEa9B__c as String//序列号
+  Date date = map.field_364s7__c as Date//日期
+
+if(id==null || id==""){
+	return
+}
+List eachid= id.split(";") as List
+eachid.each{
+	eachid_s->
+        String objectData = eachid_s as String
+        List searchCondition = [["name":objectData],["life_status":"normal"]]
+        def(Boolean error0,QueryResult result0,String errorMessage0) = Fx.object.find("object_2efU5__c",searchCondition,99,0)
+        List dataList = result0.dataList
+        dataList.each{ item_s->
+        Map objectData2 = item_s as Map
+		String subid = objectData2._id as String
+		String sname = objectData2.name as String
+
+		def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("object_2efU5__c",subid,["field_qyt68__c":null],false)
+
+
+
+
+
+
+      }
+        
+	
+	
+}}

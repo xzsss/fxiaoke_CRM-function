@@ -1,0 +1,20 @@
+String objectid=context.data['field_oaegA__c']//项目id
+String program =context.data['field_bWbpj__c']//当前问题
+String record_type =context.data['record_type']//业务类型  FAE问题更新 default__c 销售问题更新 record_A3R8l__c 
+//项目 NewOpportunityObj  关键问题更新（FAE）field_Yvck8__c  关键问题更新（销售） field_6X7qK__c
+Map updata = [:]
+ if(record_type=='default__c'){
+  updata=[
+  "field_Yvck8__c":program,
+    ];
+ }else{
+  updata=[
+  "field_6X7qK__c":program,
+    ];
+ }
+def(erorr,data,erorrMessage)=Fx.object.update("NewOpportunityObj", objectid, updata)
+ if( erorr ){
+ log.info("erorr=="+erorrMessage) 
+ }else{
+ log.info("更新成功")
+ }

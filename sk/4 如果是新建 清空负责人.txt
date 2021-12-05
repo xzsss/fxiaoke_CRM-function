@@ -1,0 +1,8 @@
+String life = context.data.life_status  as String 
+if (life==null  ||life==''){
+  UIEvent event = UIEvent.build(context) { 
+   //主对象修改数据
+   editMaster("owner": '',)
+}
+return event
+}

@@ -1,0 +1,21 @@
+String html = context.data.field_48pdI__c
+List htmltrans = Fx.utils.htmlParseText(html)
+
+String id = context.data._id
+
+def byteData = Strings.toUTF8Bytes(html)
+def ret = Fx.file.uploadFile(".html",byteData.size(),byteData)
+String path = ret[1]['path'] as String
+List fi = [["ext":"html","path":path,"filename":"记录内容.html","size":byteData.size()]]
+String hs = htmltrans[1] as String
+if(hs.length()>1700){
+  hs=hs.substring(0,1650)
+  hs="[请将记录内容附件加入附件，或将内容粘贴]"+hs
+  String filrurl = "https://www.fxiaoke.com/FSC/EM/File/DownloadByPath?path="+path+".html&name=记录内容.html"
+  hs=hs+"[数据过多，后续内容省略，请至附件中查看:    "+filrurl+"    ]"
+
+}
+
+def ret2 = Fx.object.update("object_lp7mr__c",id,["field_bSg1t__c":fi,"field_33bX0__c":hs])
+
+log.info(ret2[2])

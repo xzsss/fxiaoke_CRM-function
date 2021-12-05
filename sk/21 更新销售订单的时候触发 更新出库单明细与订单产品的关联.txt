@@ -1,0 +1,52 @@
+//create by zengyu.kou 2020.10.21
+//更新订单时自动将订单产品与出库单做绑定
+String dataId = context.data["_id"] as String
+
+//根据订单ID查找订单产品
+List criteria = [
+  ["order_id":dataId],
+  ["life_status":"normal"]
+]
+def(error,data,msg) = Fx.object.find("SalesOrderProductObj",  criteria, 100,  0)
+if( (data["size"] as int )>0){       //判断查询出来的结果有没有数据
+  List datalist = data["dataList"] as List
+  //循环
+  datalist.eachWithIndex{
+  item,int i ->
+    String code = item["field_9dV13__c"] as String //订单产品中的订单编号
+    String productId = item["_id"] as String //订单产品ID
+    //log.info("code:"+code)
+    //log.info("productId:"+productId)
+    log.info("productId:"+productId)
+    
+    //根据分录内码 查找出库单明细
+    criteria = [
+      ["field_1juF1__c":code],
+      ["life_status":"normal"]
+    ]
+    log.info(criteria)
+    def(errorC,dataC,msgC) = Fx.object.find("object_1nopg__c", criteria,  100,  0)
+ 
+    if( (dataC["size"] as int )>0){       //判断查询出来的结果有没有数据
+      List datalistC = dataC["dataList"] as List
+      //循环
+      datalistC.eachWithIndex{
+      itemC,int j ->
+        String detailId = itemC["_id"] as String
+        
+        //将出库单明细和订单产品做绑定
+        Map updateMap = [
+          "field_XFJri__c":productId
+        ]
+        def(errorU,dataU,msgU) = Fx.object.update("object_1nopg__c",  detailId,  updateMap)
+        log.info(updateMap)
+        log.info("更新出库单明细"+errorU)
+
+        log.info("更新出库单明细"+msgU)
+		//def(errorU,dataU,msgU) = Fx.object.update("object_1nopg__c",  detailId,  updateMap)
+        //log.info("更新出库单明细"+errorU)
+        //log.info("更新出库单明细"+msgU)
+      }
+    }
+  }
+}

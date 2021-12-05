@@ -1,0 +1,71 @@
+//去年
+Date dt_now = Date.now() as Date//当前时间
+Date dt_now_first=dt_now.withMonth(1).withDay(1)
+Date dt_lastyear = dt_now_first-1.years
+Date dt_afteryear=dt_now_first+1.years
+log.info("//开始时间"+dt_lastyear)
+log.info("//结束时间"+dt_now_first)
+//符合条件的数据id
+List ids =  context.objectIds as List
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("ProductObj",ids)//产品
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map._id as String
+  log.info("//ID："+id)
+  //根据id找到销售订单----------------------------------------------------------------------------------
+  //客户名称，生命状态正常，当年销售订单，销售订单金额不为空
+    List searchCondition = [["product_id":id],["life_status":"normal"],["field_1CwU6__c":Operator.EXISTS(true)],["quantity":Operator.EXISTS(true)],["field_119Xt__c": Operator.GTE(dt_lastyear)],["field_119Xt__c": Operator.LT(dt_now_first)]]
+    Fx.log.info("查询条件为 :" + searchCondition)
+    BigDecimal sum =  0//总金额
+    BigDecimal sum2 =  0//
+    boolean hasData = true
+    Integer limit = 100
+    //循环聚合所有数据
+    Map updateData = [:]
+    Range range =  Ranges.of(0,200)
+    range.each { i -> 
+      if(hasData == false){
+        return
+      }
+      
+      Integer skip = i * limit
+      def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find("SalesOrderProductObj",searchCondition,limit,skip)
+      if(error){
+        hasData = false
+        Fx.log.info("查询失败" + "当前跳过的数量为 " + skip + "错误原因为" + errorMessage)
+        return
+      }
+      
+      //获取所有更新的数据,如果是预设对象，就在循环里面直接更新。
+      List dataList = result.dataList
+      if(dataList.size() < limit){
+        hasData = false
+      }
+      
+      //如果不需要合并数据，在这里就可以100条
+      dataList.each{ item_s->
+        Map objectData = item_s as Map
+        BigDecimal je = objectData.quantity as BigDecimal//销售数量
+        BigDecimal je2 = objectData.field_1CwU6__c as BigDecimal//销售数量
+if(je2>0){
+          sum += je
+          sum2 += je2
+        }
+      }
+    }
+    if(sum==0){
+  return
+}
+    log.info("总金额为："+sum)
+    log.info("总金额为："+sum2/sum)
+//-----------------------------------------------------------------------------------------------------
+if(sum==0){
+  return
+}
+  updateMap.put(id,["field_eEPjE__c":sum])
+  def (Boolean error2,List data2,String errorMessage2) =  object.batchUpdate("ProductObj",updateMap)
+  updateMap.put(id,["field_8rm36__c":(sum2/sum).setScale(2,BigDecimal.ROUND_HALF_UP)])
+  def (Boolean error3,List data3,String errorMessage3) =  object.batchUpdate("ProductObj",updateMap)
+}
+log.info(updateMap)

@@ -1,0 +1,28 @@
+String  id = context.data._id as String //ID
+String  name =context.data.name as String //名字
+
+def(searchER,searchData,searchMsg)= Fx.object.find("object_2efU5__c",  [["name":name],["_id":Operator.NE(id)]], 200, 0)
+if(!searchER)
+{
+  if((searchData["total"] as Integer) > 0)
+  {
+  List dataList=  searchData["dataList"] as List 
+    dataList.eachWithIndex
+    {
+      item ,int i ->
+      String  oldID =  item["_id"] as String  
+      def(udpateOldER,updateOldData,updateOldMsg) = Fx.object.update( "object_2efU5__c", oldID,  ["field_Hxsw6__c":false])
+      log.info("同名旧序列号修改状态为否是否成功："+udpateOldER)
+       log.info("同名旧序列号修改状态为否描述说明:"+updateOldMsg)
+      
+    }
+    
+    
+  }
+  
+  
+}
+
+ def(udpateER,updateData,updateMsg) = Fx.object.update( "object_2efU5__c", id,  ["field_Hxsw6__c":true])
+      log.info("当前序列号修改状态为是："+udpateER)
+      log.info("当前序列号修改状态为是说明:"+updateMsg)

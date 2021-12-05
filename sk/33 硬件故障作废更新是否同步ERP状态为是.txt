@@ -1,0 +1,6 @@
+
+String  id  =context.data._id as String // Id
+
+def(updateER,updateData,updateMsg) =  Fx.object.update( "object_5sdRw__c",  id,  ["field_ebGsU__c":"是"])
+log.info(updateER)
+log.info(updateMsg)

@@ -1,0 +1,68 @@
+
+//符合条件的数据id
+List ids =  context.objectIds as List
+log.info( ids)
+log.info( context.data)
+def(boolean error1,List dataList1,String errorMessage1) = Fx.object.findByIds("object_B678w__c",ids)//出差信息
+Map updateMap = [:] as Map
+dataList1.each{ item ->
+  Map map = item as Map
+  String id = map._id as String
+  log.info("//ID："+id)
+  //根据id找到销售订单----------------------------------------------------------------------------------
+  //客户名称，生命状态正常，当年销售订单，销售订单金额不为空
+    List searchCondition = [["field_u1zw2__c":id]]
+    Fx.log.info("查询条件为 :" + searchCondition)
+    boolean hasData = true
+    Integer limit = 100
+    //循环聚合所有数据
+    Map updateData = [:]
+    Range range =  Ranges.of(0,200)
+	String res1='' as String
+	String res2='' as String
+    range.each { i -> 
+      if(hasData == false){
+        return
+      }
+      
+      Integer skip = i * limit
+      def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find("object_cZzRK__c",searchCondition,limit,skip)
+      if(error){
+        hasData = false
+        Fx.log.info("查询失败" + "当前跳过的数量为 " + skip + "错误原因为" + errorMessage)
+        return
+      }
+      
+      //获取所有更新的数据,如果是预设对象，就在循环里面直接更新。
+      List dataList = result.dataList
+      if(dataList.size() < limit){
+        hasData = false
+      }
+      
+      //如果不需要合并数据，在这里就可以100条
+      dataList.each{ item_s->
+        Map objectData = item_s as Map
+		String res = objectData.field_t2950__c as String
+		if(objectData.field_Q29aZ__c=='option1'){
+			res1=res1.concat(res)
+			res1=res1.concat('\r\r')
+		}else{
+			res2=res2.concat(res)
+			res2=res2.concat('\r\r')
+		}
+
+
+      }
+    }
+
+    log.info("res1："+res1)
+    log.info("res2："+res2)
+//-----------------------------------------------------------------------------------------------------
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("object_B678w__c",id,["field_7jlLV__c":res1],false)
+
+  def (Boolean error3,Map data3,String errorMessage3) =  Fx.object.update("object_B678w__c",id,["field_7A982__c":res2],false)
+  //updateMap.put(id,["field_eEPjE__c":sum])
+  //updateMap.put(id,["field_8rm36__c":(sum2/sum)])
+}
+//log.info(updateMap)
+
