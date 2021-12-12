@@ -1,0 +1,47 @@
+/*
+20211110
+我又回来了，这是二期开发的第一个函数，讲真我还以为第二期不会再交给我了
+一期的函数问题辣么多真是非常抱歉
+新建销售合同，选择负责人，保存时校验负责人必须为该客户名下的【客户转正及信用申请】
+（生命状态为正常，同步状态为Y）的相关团队成员，校验不满足时提示【负责人必须为客户下转正申请的相关团队成员】，并阻断保存
+
+需求是按钮点击的时候验证，但是我觉得 即时判断更好
+
+*/
+Boolean find =false
+String own = context.data.owner as String
+String cust = context.data.field_F488p__c as String
+def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find('object_m5u1P__c',[['field_878ax__c':cust],["life_status":"normal"],["field_V4u1Y__c":"Y"]],100,0)
+//我记得一期需求里说的是 一个客户只能对应一个转正申请，所以团队选择第一个就可以了
+//但是我拒绝，万一有特殊情况怎么办，我依旧要去遍历
+//这是作为一个开发人员的矜持，距离双11只剩半小时了，要加速开发了
+if(error){
+        Fx.log.info(errorMessage)
+        return
+      }
+
+List data0 = result.dataList
+data0.each{
+  e->
+  String  eid= e['_id'] as String
+def (Boolean error1,List data1,String errorMessage1) = Fx.object.getTeamMember("object_m5u1P__c",eid)
+//api文档里写的事返回data格式是 map  结果实际上是list 我信你个鬼
+data1.each{
+  f->
+    String emp = f['teamMemberEmployee']
+    if (emp==own){
+      find=true
+    }
+}
+
+
+
+}
+
+if (find==false){
+  Remind remind = Remind.Text("负责人必须为客户下转正申请的相关团队成员")
+  return remind
+
+}
+return
+//最后还是没有赶上12点的抢购TAT

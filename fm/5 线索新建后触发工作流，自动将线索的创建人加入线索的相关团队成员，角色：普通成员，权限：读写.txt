@@ -1,0 +1,14 @@
+/**
+ * 20211110 
+线索新建后触发工作流，自动将线索的创建人加入线索的相关团队成员，角色：普通成员，权限：读写
+*/
+String id=context.data._id as String 
+String creatby=context.data.created_by as String 
+String owner1=context.data.owner as String 
+if(creatby==owner1){
+  //创建人就是负责人 那就直接返回
+  return
+}
+List creatbyList =context.data.created_by as List
+def (Boolean error0,Map data0,String errorMessage0) = Fx.object.addTeamMember("LeadsObj",id,creatbyList,4,2)//新增团队成员 想修改权限 就改后面的数字 具体可以看上面的使用手册
+log.info(errorMessage0)

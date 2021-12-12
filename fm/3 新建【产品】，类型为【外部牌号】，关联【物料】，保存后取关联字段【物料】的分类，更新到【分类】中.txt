@@ -1,0 +1,22 @@
+/**
+ * 简单的说就是把物料 字段的分类抄过来 写到自己的分类里 
+ * 
+ * 
+*/
+
+String id = context.data._id
+String  wl=context.data.field_s2tcC__c  as String
+
+def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find('ProductObj',[['_id':wl] ],100,0)
+List data0 = result.dataList
+data0.each{
+  e->
+  String  type= e['category'] as String
+
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("ProductObj",id,["category":type]);
+
+}
+
+
+
+//

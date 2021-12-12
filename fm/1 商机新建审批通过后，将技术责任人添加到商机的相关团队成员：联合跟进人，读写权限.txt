@@ -1,0 +1,9 @@
+/**
+ * 20211201 
+商机新建审批通过后，将技术责任人添加到商机的相关团队成员：联合跟进人，读写权限
+*/
+String id=context.data._id as String 
+
+List tecOwner =context.data.field_132uc__c as List
+def (Boolean error0,Map data0,String errorMessage0) = Fx.object.addTeamMember("NewOpportunityObj",id,tecOwner,2,2)//新增团队成员 想修改权限 就改后面的数字 具体可以看上面的使用手册
+log.info(errorMessage0)

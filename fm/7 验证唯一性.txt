@@ -1,0 +1,27 @@
+String a = context.data.field_878ax__c as String
+String b = context.data.field_15e26__c as String
+
+UIEvent event = UIEvent.build(context) {
+//主对象、从对象数据修改，详见上
+
+def (Boolean error,QueryResult data1,String errorMessage)=Fx.object.find( "object_m5u1P__c",  [["field_878ax__c":a],["field_15e26__c":b]],  1,  0)
+List data0 = data1.dataList as List
+String aaaaa= data0 as String
+
+if (data0.isEmpty()){
+editMaster("field_nGYGG__c": "1")
+}else{
+
+editMaster("field_nGYGG__c":"0")
+remind Remind.Text("一个客户在一个组织下只能有一条转正申请数据")
+}
+
+
+
+
+
+} 
+
+
+  
+return event

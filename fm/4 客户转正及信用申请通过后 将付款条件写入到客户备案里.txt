@@ -1,0 +1,30 @@
+/**
+ * 20211129
+ * 客户转正及信用申请审批通过后，将【付款条件】反写到客户备案的【账期】中，注意有三条审批流，每一条都要加
+*/
+String id=context.data.field_878ax__c as String //客户名称
+String b=context.data.field_72a2f__c as String //付款条件
+//这里又一个很坑爹的问题 就是映射 这里 直接用map做id映射 别说我偷懒，就是大罗神仙来，也得做映射
+//
+Map map = [
+  "609a20f3dd731c000106e392": "",//项目按期付款
+   "609a207a174d0700013cfd2b": "",//	立即应付的 到期净值
+   "609a206fd02b9f00018d3e67": "Q31l66bah",//7
+   "609a208586f51500014e1409": "Sk775IG2W",//15
+   "609a208e4992b50001029475": "5K9wQ4c2y",//30
+   "609a209786f51500014e38d7": "9iLbt5mP1",//45
+   "609a20a3c201ca00017f7564": "e7lcagl1C",//60
+   "609a20b6d02b9f00018dbbdc": "wq1Gpddol",//75
+   "609a20bc6c06d500011b39c8": "1Lty9qVSy",//105
+   "609a20c686f51500014e9de1": "ihkzE6641",//90
+   "609a20cf6c06d500011b67a4": "7vHdQ858x",//120
+   "609a20e286f51500014ecd54": "5chySI1eC",//180
+   "609a20ef6c06d500011bbb58": "2mf1kt1Lh",//270
+   "609a20d91cdd650001c86fe1": "UNj1Kb2ke"//150
+]
+
+log.info(map[b])
+if (map[b]!=""){
+  def (Boolean error,Map data2,String errorMessage) =  Fx.object.update("AccountObj",id,["field_27le1__c":map[b]]);
+}
+//

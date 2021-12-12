@@ -1,0 +1,11 @@
+
+String khid = context.data._id
+BigDecimal  mll=context.data.field_m23WQ__c  as BigDecimal
+BigDecimal  a=context.data.field_F14ph__c as BigDecimal//富淼年度采购额(万)
+BigDecimal  b=context.data.field_IEsv2__c as BigDecimal//富淼年总需求额(万)
+BigDecimal  c= 0 as BigDecimal
+if( a!=null && b!=null && b!=0 ) {
+    c= a/b as BigDecimal
+}
+
+def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("AccountObj",khid,["field_X3e24__c":mll,"field_TlmHR__c":c]);

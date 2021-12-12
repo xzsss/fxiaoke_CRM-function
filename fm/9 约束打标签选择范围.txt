@@ -1,0 +1,26 @@
+List objectIds = [];//数据范围ID
+List OrderDetails = context.details["SalesOrderProductObj"] as List;
+objectIds.add("60fe58b70bd6160001b2bcd2")
+if(OrderDetails.size()>0)
+{
+  String AccountId  = context.data['account_id'] as String;//客户ID
+  
+  String ProductId = OrderDetails.get(0)['product_id'] as String;//产品ID
+  String ProductNo = OrderDetails.get(0)['field_h1cdN__c'] as String;//物料编码
+  
+  log.info("AccountId="+AccountId+"。ProductId="+ProductId+"。ProductNo="+ProductNo);
+  
+  List ProductIds = [];
+  def (Boolean error,QueryResult result,String errorMessage) = Fx.object.find("object_jm43l__c",[["field_l6kNh__c":AccountId],["field_8fg1o__c": ProductNo]], 100, 0);//通过客户ID取得 标签
+  log.info(result)
+  log.info(errorMessage)
+  result.dataList.each{ item1 ->
+          Map map = item1 as Map
+          objectIds.add(map._id)
+  }
+  log.info(objectIds)
+
+
+}
+
+return objectIds;

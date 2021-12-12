@@ -1,0 +1,107 @@
+/***
+ * 新建【物流信息单】时，会写结算数量，关联对应的送达地址（物流合同价）。
+ * 根据这两个字段，需要取【物流合同价】中的对应数量的物流承运商单价到物流信息单并且取物流承运商中的物流账号（人员）到物流信息单中。
+ * 还有个判断逻辑上面描述的前提是：物流信息单、物流合同价中的性质分为普货和危险品，
+ * 危险品的话，取值的是1-2.85  2.85-5   5-10  10-20 20-30。
+ * 普货取值是1-5  5-10  10-20  20-30
+ * 
+ * 建议结合函数理解
+ * 
+*/
+String adress = context.data.field_UEnRd__c as String //送达地址
+
+BigDecimal  count = context.data.field_5g1N1__c as BigDecimal//物料数量（吨）
+
+String type = context.data.field_4zfeL__c as String//是否危险品
+//
+String additional  = context.data.field_4Vj04__c as String 
+
+if(adress==null||count==null||additional!="option1"){
+
+//二者有一个为空 不触发函数
+log.info(adress)
+log.info(count)
+log.info(additional)
+log.info('有空值  或选项不符合 直接返回')
+return  UIEvent.build(context) {} 
+
+}
+
+
+
+UIEvent event2 = UIEvent.build(context) {
+//主对象、从对象数据修改，详见上
+log.info( adress)
+def (Boolean error,QueryResult data1,String errorMessage)=Fx.object.find( "object_5XUs5__c",  [["_id":adress]],  1,  0)
+//去查找 物流合同价
+log.info( data1)
+log.info(errorMessage)
+List data0 = data1.dataList as List
+log.info('数量')
+log.info(count)
+List cys;
+List price ;
+if (type=="option1"){
+  //普通
+  if(count<5){
+    cys=data0['field_X26EO__c'] as List
+    price=data0['field_lbl03__c'] as List
+  }else if(5<=count&&count<10){
+    cys=data0['field_n4XkD__c'] as List
+    price=data0['field_35sPl__c'] as List
+  }else if(10<=count&&count<20){
+    cys=data0['field_hL1E1__c'] as List
+    price=data0['field_IJ2rh__c'] as List
+  }else if(20<=count&&count<=30){
+    cys=data0['field_ese84__c'] as List
+    price=data0['field_Bb83y__c'] as List
+  }
+}else{
+  //危险品
+  if(1<=count&&count<2.85){
+    cys=data0['field_6k1p1__c'] as List
+    price=data0['field_7y3Dw__c'] as List
+  }else if(2.85<=count&&count<5){
+    cys=data0['field_fj84H__c'] as List
+    price=data0['field_2A3V5__c'] as List
+  }else if(5<=count&&count<10){
+    cys=data0['field_n4XkD__c'] as List
+    price=data0['field_35sPl__c'] as List
+  }else if(10<=count&&count<20){
+    cys=data0['field_hL1E1__c'] as List
+    price=data0['field_IJ2rh__c'] as List
+  }else if(20<=count&&count<=30){
+    cys=data0['field_ese84__c'] as List
+    price=data0['field_Bb83y__c'] as List
+  }
+}
+log.info(price)//这里经常报空错误
+log.info(cys)
+if( price!=[null]&&price!=null){
+
+
+editMaster("field_N25g4__c":price[0])
+
+}
+if( cys!=[null]&&cys!=null){
+
+editMaster("field_q2Qf0__c": cys[0])
+
+def (Boolean error3,QueryResult data3,String errorMessage3)=Fx.object.find( "object_KN2sK__c",  [["_id":cys[0]]],  1,  0)
+//去查找 物流合同价
+
+List data4 = data3.dataList as List
+log.info(data4['field_rlJA2__c'])
+List data40 = data4['field_rlJA2__c'] as List
+
+editMaster("field_70viO__c":data40[0])
+
+}
+
+
+} 
+
+
+  
+return event2
+
