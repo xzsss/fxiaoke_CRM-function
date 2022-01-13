@@ -1,0 +1,60 @@
+/**20210819 补充注释
+ * 和另一个函数需求一样这里不过多描述了
+ * 
+*/
+String id = context.data._id as String
+String state = context.data.field_Ahjn1__c as String
+def(Boolean error,QueryResult result,String errorMessage) = Fx.object.find('object_Kmq6r__c',[['field_071vc__c':id],["life_status":"normal"]],100,0)
+      if(error){
+        Fx.log.info(errorMessage)
+        return
+      }
+      log.info(result.total)
+      if(result.total>0&&state!='Y'){
+        return [ "error":true, "errorMessage":"有下游外向发货单，禁止编辑", "block":true ]
+      }
+      
+//20210824 新的需求 修改订单的时候 去核对明细的数量和 不能大于 对应的 订单/合同 里的数量
+String  ht= context.data.field_3v42O__c as String
+String  dd= context.data.field_j28iK__c as String
+if(ht==null && dd==null){
+  return 
+}
+BigDecimal findnum = 0
+if(ht==null){
+  //查找销售订单 数量
+    def(Boolean error0,QueryResult result0,String errorMessage0) = Fx.object.find('SalesOrderObj',[['_id':dd]],100,0)
+      if(error0){
+        Fx.log.info(errorMessage0)
+        return
+      }
+      findnum=result0.dataList['field_MTB28__c'][0] as BigDecimal
+  
+  
+}else{
+  //查找销售合同 数量
+  def(Boolean error1,QueryResult result1,String errorMessage1) = Fx.object.find('object_2JnS4__c',[['_id':ht]],100,0)
+      if(error1){
+        Fx.log.info(errorMessage1)
+        return
+      }
+      findnum=result1.dataList['field_sD78e__c'][0] as BigDecimal
+      
+}
+//遍历所有detail  计算数量和 这里不要直接用表头的统计字段 这货保存后才能生效
+List ds = context.details['SalesOrderProductObj']
+BigDecimal realnum =0
+ds.each{
+  dse->
+  Map dsel = dse as Map
+  BigDecimal eachq =dsel.quantity as BigDecimal
+  realnum=realnum+eachq
+}
+if(realnum>findnum){
+  String realnums= realnum as String
+  String findnums= findnum as String
+   return [ "error":true, "errorMessage":"明细数量为"+realnums+ "大于当前参考单据的数量"+findnums, "block":true ]
+}
+
+
+      return

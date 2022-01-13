@@ -1,0 +1,12 @@
+//object_Wdfs8__c:【合同明细】
+//field_Jdy7n__c:项目行号
+String a =context.data._id as String; 
+String t  = context.data.field_SnvyZ__c as String; //field_SnvyZ__c：临时自增编号
+if(t==null||t==""){
+  return;
+}
+
+String news = t.substring(t.length()-6,t.length());
+BigDecimal aa=  BigDecimal.of(news);
+
+def (Boolean error,Map data,String errorMessage) =  Fx.object.update("object_Wdfs8__c",a,["field_Jdy7n__c":aa],false);

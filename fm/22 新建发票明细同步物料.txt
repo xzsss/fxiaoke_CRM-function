@@ -1,0 +1,8 @@
+/**
+ * 20210820 补充注释
+ * 看起来 应该是把当前单子的一个字段写到关联单子的另一个字段上 具体业务场景需要业务人员补充了
+*/
+String a=context.data.field_17dyl__c as String
+String id =(String)context.data._id
+
+def (Boolean error,Map data2,String errorMessage) =  Fx.object.update("object_1W5un__c",id,["field_17dyl__c":a]);

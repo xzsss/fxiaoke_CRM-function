@@ -1,0 +1,67 @@
+/**
+ * 注释在隔壁
+*/
+List dps=context.data.field_fOX1l__c as List 
+if(dps==null){
+  return []
+}
+String deptId = dps[0] as String //销售办事处 apiname
+def (Boolean error,Map data1,String errorMessage)=Fx.object.findById( "DepartmentObj", deptId);
+if(error) {
+  log.info("【ERROR】获取部门信息失败！" + errorMessage);
+  return null;
+}
+String dpname = data1['name'] as String 
+List s= []
+if (dpname == "功能性单体事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织"]
+} 
+else if (dpname == "制浆造纸化学品事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织"]
+} 
+else if (dpname == "矿物加工化学品事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织"]
+}
+else if (dpname == "油气开采化学品事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织"]
+} 
+else if (dpname == "工业与特性助剂事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织"]
+} 
+else if (dpname == "水处理化学品事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织"]
+} 
+else if (dpname == "膜产品与膜应用事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织","苏州富淼膜科技销售组织","苏州金渠环保科技销售组织","苏州聚微环保科技销售组织"]
+} 
+else if (dpname == "能源动力事业部") {
+s=["江苏富淼股份销售组织"]
+} 
+else if (dpname == "国际业务事业部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织","苏州富淼膜科技销售组织"]
+} 
+else if (dpname == "市场部") {
+s=["江苏富淼股份销售组织","南通博亿销售组织","苏州富淼膜科技销售组织","苏州金渠环保科技销售组织","苏州聚微环保科技销售组织"]
+} 
+else if (dpname == "博亿子公司") {
+s=["南通博亿销售组织"]
+} 
+
+
+//else if (dpname == "功能性单体事业部") {
+//s=["苏州聚微环保科技销售组织","苏州富淼膜科技销售组织","苏州富淼膜科技销售组织"]
+//}
+else {
+s=[]
+}
+def (Boolean error0,QueryResult data0,String errorMessage0) =  Fx.object.find("object_DOE3D__c",[["name": Operator.IN(s)]],["name":1],10,0,true);
+List data2 = data0.dataList
+List ret = []
+
+data2.each{
+  item->
+   ret.add(item['_id'])
+}
+  
+  
+return ret

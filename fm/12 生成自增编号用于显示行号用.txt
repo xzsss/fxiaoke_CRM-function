@@ -1,0 +1,11 @@
+String a = context.data.order_id as String;
+def returnByRule = IncrementNumber.buildRule
+ {
+      counter =a // 计数器的key,可以简单理解为一个标识,相同的标识的会递增
+      condition = "NONE"      // 按年、月、日重计 `YEAR`  `MONTH`  `DAY`  `NONE`
+      postfix = "0"     //后缀
+      prefix =  a    // 前缀
+      serialNumber = 5         // 编号位数
+      initialValue = 1 // 默认值为1
+ }
+return returnByRule

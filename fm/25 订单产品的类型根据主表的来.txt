@@ -1,0 +1,107 @@
+/**
+ * 20210820 补充注释
+ * 订单产品的类型根据主表的来
+ * 这里明细的产品类型 和主表的产品类型 内部值不一样 所以我用了个switch 后续有变动直接补充就好
+*/
+String a =context.data.field_HBWf1__c as String; //
+String dv=""
+switch(a) {
+     case "21gpT2l4e":
+       dv="f048UCk4x"
+       break;
+       case "mt58xkX6i":
+       dv="2aY9YSjp1"
+       break;
+       case "42eJ97626":
+       dv="MhFrSC712"
+       break;
+       case "20Z2oy2Cs":
+       dv="g20o8823e"
+       break;
+       case "2VJig3xc1":
+       dv="D52Qzf9qh"
+       break;
+       case "GgDNm9j2q":
+       dv="D52Qzf9qh"
+       break;
+       case "x5K9cr9sT":
+       dv=""
+       break;
+       case "fBBWm1gba":
+       dv=""
+       break;
+       case "S3nBGFa03":
+       dv=""
+       break;
+       case "51hhEbOQ5":
+       dv="qk335livj"
+       break;
+       case "7kso38UBB":
+       dv=""
+       break;
+       case "0vX1177dR":
+       dv="dVfVn75gj"
+       break;
+       case "ao4Sap1Al":
+       dv="dBB1xzjp2"
+       break;
+       case "9ishYvKfx":
+       dv="22ZjMTvh9"
+       break;
+       case "imsiG1c31":
+       dv="p8so17e8r"
+       break;
+       case "uSae4obOs":
+       dv="c1ma14c5s"
+       break;
+       case "kbOmC1B4C":
+       dv="e1a7jJqGV"
+       break;
+       case "uwPk6KOh3":
+       dv="651vMxdkv"
+       break;    
+       case "jew15hFVD":
+       dv="1kFWikclk"
+       break; 
+       case "433SWXW3i":
+       dv="1kFWikclk"
+       break;
+       case "LlXqf7LuB":
+       dv="1kFWikclk"
+       break;
+       case "1ffR3t61D":
+       dv="fBGmnCf82"
+       break;
+       case "q7Uypvt2G":
+       dv="1kFWikclk"
+       break;
+       case "Ko6c7v12g":
+       dv="f048UCk4x"
+       break;
+       case "IC3qm115J":
+       dv="f048UCk4x"
+       break;
+       case "0e1AZCPsq":
+       dv="fBGmnCf82"
+       break;
+    
+    
+  default:
+  break;
+
+}
+UIEvent event = UIEvent.build(context) {
+//主对象、从对象数据修改，详见上
+editDetail "SalesOrderProductObj" set("field_q9IQ2__c": a)
+if(dv!=""){
+  editDetail "SalesOrderProductObj" set("field_M2iXC__c": dv)
+}
+
+
+
+
+} 
+
+
+  
+return event

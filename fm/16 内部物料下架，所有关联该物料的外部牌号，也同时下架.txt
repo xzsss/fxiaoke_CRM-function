@@ -1,0 +1,40 @@
+/**
+ * 《补充注释》
+ *              
+ * 外部 产品 触发
+ * 关联 产品 下架
+ * 此处 函数 优化
+ * 循环联查 莫怕条数过大
+*/
+String type =context.data.field_2dU9f__c as String
+log.info(type)
+if(type=='n58NMy1KR'){
+  return 
+}
+
+String id =context.data._id as String
+String product_status= context.data.product_status as String
+int skip  = 0
+int jump   = skip*200
+boolean cont=true
+
+if(cont){
+def (Boolean error1,QueryResult data1,String errorMessage)=Fx.object.find( "ProductObj",  [["field_s2tcC__c":id],['field_2dU9f__c':'n58NMy1KR']],  200,  jump)
+if(data1.size==0){
+  //如果没有结果 返回
+  return 
+}
+if(data1.size<200){
+  cont=false
+}
+skip=skip+1
+List data0 = data1.dataList
+data0.each{
+  e->
+  String  eid= e['_id'] as String
+  def (Boolean error2,Map data2,String errorMessage2) =  Fx.object.update("ProductObj",eid,["product_status":product_status]);
+  if(error2){
+    log.info(errorMessage2)
+  }
+
+}}

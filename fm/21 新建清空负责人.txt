@@ -1,0 +1,15 @@
+/**
+ * 领导说： 不能有默认的负责人
+ * 于是就有了这个函数
+ * 通过 name的有无判断是新建 还是编辑
+ * 毕竟
+ * 新建完毕后 才会有name
+ * 这还是个新建后不可修改的字段
+*/
+String LS= context.data.name
+UIEvent event = UIEvent.build(context) {
+if(LS==null){
+ editMaster("owner": "") 
+}
+}
+return event

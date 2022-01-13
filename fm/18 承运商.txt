@@ -1,0 +1,10 @@
+/**
+ * 20210820 补充注释
+ * 将 承运商 写入
+*/
+String  cys = context.data.field_A0rbM__c 
+String id= context.data.field_5Z1hY__c 
+def (Boolean error,Map data2,String errorMessage) =  Fx.object.update("object_Kmq6r__c",id,["field_5ctS1__c":cys]);
+if(error){
+  log.info(errorMessage)
+}

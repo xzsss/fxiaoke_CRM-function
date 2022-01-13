@@ -1,0 +1,12 @@
+/**
+ * 根据销售办事处，限制销售组所选范围
+*/
+List dps=context.data.field_fOX1l__c as List 
+if(dps==null){
+  return []
+}
+String deptId = dps[0] as String //销售办事处 apiname
+QueryTemplate template1 = QueryTemplate.AND(
+  ["parent_id":Operator.EQ(deptId)]
+  )
+return template1

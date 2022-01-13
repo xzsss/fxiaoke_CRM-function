@@ -1,0 +1,24 @@
+/**
+ * 20210820 补充注释
+ * 转正申请自动生成合作伙伴
+ * 主要就是这几个字段 需要加新字段的时候要补充
+*/
+String kh=context.data.field_878ax__c as String //转正申请里的客户
+String xszz=context.data.field_15e26__c as String //转正申请里的销售组织
+
+//log.info(kh)
+//log.info(xszz)
+
+
+def (Boolean error,QueryResult data1,String errorMessage)=Fx.object.find( "AccountObj",  [["_id":kh]],  1,  0)
+//log.info(data1)
+List data2 = data1.dataList
+List t = data2['field_w9NJR__c'] as List
+List c = data2['country'] as List
+List khn= data2['name'] as List
+String khn1=khn[0]
+def(Boolean error3,Map data3,String errorMessage3) = Fx.object.create("object_KN2sK__c",["name":khn1,"field_j2cwa__c":xszz,"field_EgyZ2__c":t[0],"field_u6id1__c":"o4cMW549t","field_9NaqG__c":c[0]],null,true);
+
+if(error3){
+  log.info(errorMessage3)
+}
